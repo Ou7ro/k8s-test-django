@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'webapp.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': env.dj_db_url('DATABASE_URL', 'postgres://...'),
+    'default': env.dj_db_url('DATABASE_URL', 'postgres://myuser:mypassword@postgres:5432/mydb'),
 }
 
 
