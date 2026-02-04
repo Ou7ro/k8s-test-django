@@ -17,14 +17,14 @@
 Запустите базу данных и сайт:
 
 ```shell
-$ docker-compose up
+$docker-compose up
 ```
 
 В новом терминале, не выключая сайт, запустите несколько команд:
 
 ```shell
-$ docker-compose exec web python manage.py migrate  # создаём/обновляем таблицы в БД
-$ docker-compose exec web python manage.py createsuperuser  # создаём в БД учётку суперпользователя
+$docker-compose exec web python manage.py migrate  # создаём/обновляем таблицы в БД
+$docker-compose exec web python manage.py createsuperuser  # создаём в БД учётку суперпользователя
 ```
 
 Готово. Сайт будет доступен по адресу [http://127.0.0.1:8080](http://127.0.0.1:8080). Вход в админку находится по адресу [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).
@@ -37,9 +37,9 @@ $ docker-compose exec web python manage.py createsuperuser  # создаём в 
 
 Чтобы обновить приложение до последней версии подтяните код из центрального окружения и пересоберите докер-образы:
 
-``` shell
-$ git pull
-$ docker-compose build
+```bash
+$git pull
+$docker-compose build
 ```
 
 После обновлении кода из репозитория стоит также обновить и схему БД. Вместе с коммитом могли прилететь новые миграции схемы БД, и без них код не запустится.
@@ -58,12 +58,15 @@ Running migrations:
 В качестве менеджера пакетов для образа с Django используется pip с файлом requirements.txt. Для установки новой библиотеки достаточно прописать её в файл requirements.txt и запустить сборку докер-образа:
 
 ```sh
-$ docker-compose build web
+$docker-compose build web
 ```
 
 Аналогичным образом можно удалять библиотеки из зависимостей.
 
+```html
 <a name="env-variables"></a>
+```
+
 ## Переменные окружения
 
 Образ с Django считывает настройки из переменных окружения:
@@ -75,3 +78,37 @@ $ docker-compose build web
 `ALLOWED_HOSTS` -- настройка Django со списком разрешённых адресов. Если запрос прилетит на другой адрес, то сайт ответит ошибкой 400. Можно перечислить несколько адресов через запятую, например `127.0.0.1,192.168.0.1,site.test`. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#allowed-hosts).
 
 `DATABASE_URL` -- адрес для подключения к базе данных PostgreSQL. Другие СУБД сайт не поддерживает. [Формат записи](https://github.com/jacobian/dj-database-url#url-schema).
+
+## Развертывание Django приложения в Kubernetes
+
+### Предварительные требования
+
+- Minikube установлен и запущен
+- kubectl настроен для работы с Minikube
+
+## Развертывание
+
+### 1. Создание Secret
+
+Создайте файл `kubernetes/secret.yaml` на основе шаблона `kubernetes/secret.yaml.template`:
+
+```bash
+cp kubernetes/secret.yaml.template kubernetes/secret.yaml
+```
+
+Отредактируйте kubernetes/secret.yaml, заполнив реальные значения:
+
+DATABASE_URL - строка подключения к PostgreSQL
+
+SECRET_KEY - секретный ключ Django
+
+Применение конфигураций
+
+```bash
+kubectl apply -f kubernetes/secret.yaml
+```
+
+```bash
+kubectl apply -f kubernetes/django-deployment.yaml
+kubectl apply -f kubernetes/django-service.yaml
+```
