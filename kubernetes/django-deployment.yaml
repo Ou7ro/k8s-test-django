@@ -43,9 +43,9 @@ spec:
               name: django-secret
               key: SECRET_KEY
         - name: DEBUG
-          value: "True"
+          value: "False"
         - name: ALLOWED_HOSTS
-          value: '*'
+          value: "star-burger.test,localhost,127.0.0.1"
         resources:
           requests:
             memory: "128Mi"

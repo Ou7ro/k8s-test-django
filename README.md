@@ -83,32 +83,88 @@ $docker-compose build web
 
 ### Предварительные требования
 
-- Minikube установлен и запущен
-- kubectl настроен для работы с Minikube
+- Установленный и запущенный Minikube
+- Настроенный `kubectl` для работы с Minikube
 
-## Развертывание
+### Быстрый старт
 
-### 1. Создание Secret
-
-Создайте файл `kubernetes/secret.yaml` на основе шаблона `kubernetes/secret.yaml.template`:
+1. **Создайте все необходимые ресурсы Kubernetes:**
 
 ```bash
-cp kubernetes/secret.yaml.template kubernetes/secret.yaml
-```
-
-Отредактируйте kubernetes/secret.yaml, заполнив реальные значения:
-
-DATABASE_URL - строка подключения к PostgreSQL
-
-SECRET_KEY - секретный ключ Django
-
-Применение конфигураций
-
-```bash
+# Примените все конфигурационные файлы
 kubectl apply -f kubernetes/secret.yaml
-```
-
-```bash
 kubectl apply -f kubernetes/django-deployment.yaml
 kubectl apply -f kubernetes/django-service.yaml
+kubectl apply -f kubernetes/ingress.yaml
+```
+
+2. **Включите Ingress контроллер в Minikube:**
+
+```bash
+minikube addons enable ingress
+```
+
+3. **Проверьте, что все компоненты запустились:**
+
+```bash
+# Проверьте поды
+kubectl get pods
+
+# Проверьте сервисы
+kubectl get services
+
+# Проверьте Ingress
+kubectl get ingress
+
+# Проверьте поды Ingress контроллера
+kubectl get pods -n ingress-nginx
+```
+
+### Настройка локального домена
+
+Для доступа к сайту по домену star-burger.test необходимо добавить запись в локальный файл hosts:
+
+**Windows**
+
+1. Откройте файл `C:\Windows\System32\drivers\etc\hosts` с правами администратора
+
+2. Добавьте строку:
+
+```text
+127.0.0.1 star-burger.test
+```
+
+**macOS / Linux**
+
+1. Откройте терминал и отредактируйте файл:
+
+```bash
+sudo nano /etc/hosts
+```
+
+2. Добавьте строку:
+
+```text
+127.0.0.1 star-burger.test
+```
+
+3. Сохраните изменения (Ctrl+O, Enter, Ctrl+X)
+
+### Важное примечание для Windows и macOS
+
+При использовании Minikube с Docker драйвером необходимо запустить туннель для корректной работы Ingress:
+
+```bash
+# Запустите в отдельном окне терминала и оставьте его открытым:
+minikube tunnel
+```
+
+Не закрывайте окно с minikube tunnel! Оно должно оставаться активным для доступа к сайту.
+
+### Проверка работоспособности
+
+После выполнения всех шагов сайт будет доступен по адресу:
+
+```text
+http://star-burger.test
 ```
