@@ -184,3 +184,10 @@ http://star-burger.test
 - Ручной запуск: `kubectl create job --from=cronjob/django-clearsessions django-clearsessions-once`
 - Проверить выполнение: `kubectl get jobs`
 
+## Миграция при обновлении приложения
+
+Запустите Job, для выполнения миграций
+
+```bash
+kubectl apply -f django-migrate.yaml
+```

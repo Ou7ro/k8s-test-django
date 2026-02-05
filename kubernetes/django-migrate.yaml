@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+  labels:
+    app: django
+    component: migration
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: django_1:latest
+        imagePullPolicy: Never
+        command: ["python", "manage.py", "migrate", "--noinput"]
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: DATABASE_URL
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret
+              key: SECRET_KEY
+        - name: DEBUG
+          value: "False"
+        - name: ALLOWED_HOSTS
+          value: "star-burger.test,localhost,127.0.0.1"
+      restartPolicy: Never
