@@ -168,3 +168,19 @@ minikube tunnel
 ```text
 http://star-burger.test
 ```
+
+## Очистка сессии
+
+Автоматическая очистка устаревших сессий настраивается через CronJob, который запускается каждый месяц.
+
+### Конфигурация
+
+Файл: `django-clearsessions.yaml`
+Расписание: первый день месяца в 00:00 (по cron: `0 0 1 * *`)
+
+### Управление
+
+- Проверить CronJob: `kubectl get cronjobs`
+- Ручной запуск: `kubectl create job --from=cronjob/django-clearsessions django-clearsessions-once`
+- Проверить выполнение: `kubectl get jobs`
+
