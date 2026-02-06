@@ -91,20 +91,19 @@ $docker-compose build web
 1. **Создайте все необходимые ресурсы Kubernetes:**
 
 ```bash
-# Примените все конфигурационные файлы
-kubectl apply -f kubernetes/secret.yaml
-kubectl apply -f kubernetes/django-deployment.yaml
-kubectl apply -f kubernetes/django-service.yaml
-kubectl apply -f kubernetes/ingress.yaml
+# 1. Установите PostgreSQL
+helm install postgresql ./postgresql/postgresql -f postgresql-values.yaml
+
+# 3. Примените Django конфигурации
+kubectl apply -f secret.yaml
+kubectl apply -f django-migrate.yaml
+kubectl apply -f django-deployment.yaml
+kubectl apply -f django-service.yaml
+kubectl apply -f django-clearsessions.yaml
+kubectl apply -f ingress.yaml
 ```
 
-2. **Включите Ingress контроллер в Minikube:**
-
-```bash
-minikube addons enable ingress
-```
-
-3. **Проверьте, что все компоненты запустились:**
+2. **Проверьте, что все компоненты запустились:**
 
 ```bash
 # Проверьте поды
@@ -117,7 +116,7 @@ kubectl get services
 kubectl get ingress
 
 # Проверьте поды Ingress контроллера
-kubectl get pods -n ingress-nginx
+kubectl get pods -n ingress
 ```
 
 ### Настройка локального домена
@@ -183,11 +182,3 @@ http://star-burger.test
 - Проверить CronJob: `kubectl get cronjobs`
 - Ручной запуск: `kubectl create job --from=cronjob/django-clearsessions django-clearsessions-once`
 - Проверить выполнение: `kubectl get jobs`
-
-## Миграция при обновлении приложения
-
-Запустите Job, для выполнения миграций
-
-```bash
-kubectl apply -f django-migrate.yaml
-```
