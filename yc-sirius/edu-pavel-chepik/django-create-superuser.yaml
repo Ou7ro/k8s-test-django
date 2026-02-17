@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-create-superuser
+  namespace: edu-pavel-chepik
+  labels:
+    app: django
+    component: create-superuser
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+      - name: createsuperuser
+        image: ou7ro/django-site:0dbd3a8
+        command: ["python", "manage.py", "createsuperuser", "--noinput"]
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres
+              key: dsn
+        - name: PGSSLMODE
+          value: "verify-full"
+        - name: DJANGO_SECRET_KEY
+          value: "v3c0syb6*6b*at-4v(f4#1kihrf$1#uu1o0p#24e%%w)=i&$e%"
+        - name: DJANGO_DEBUG
+          value: "False"
+        - name: DJANGO_SUPERUSER_USERNAME
+          value: "admin"
+        - name: DJANGO_SUPERUSER_PASSWORD
+          value: "securepassword123"
+        - name: DJANGO_SUPERUSER_EMAIL
+          value: "admin@example.com"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: postgres-cert
+          mountPath: /root/.postgresql
+          readOnly: true
+      volumes:
+      - name: postgres-cert
+        secret:
+          secretName: postgres
+          items:
+          - key: root.crt
+            path: root.crt
+      restartPolicy: Never
