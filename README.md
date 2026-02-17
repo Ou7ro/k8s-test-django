@@ -182,3 +182,25 @@ http://star-burger.test
 - Проверить CronJob: `kubectl get cronjobs`
 - Ручной запуск: `kubectl create job --from=cronjob/django-clearsessions django-clearsessions-once`
 - Проверить выполнение: `kubectl get jobs`
+
+## Как подготовить dev окружение
+
+Для подключения к управляемой БД PostgreSQL используется секрет `postgres`, который содержит:
+- `host`, `port`, `username`, `password`, `name` — параметры подключения;
+- `root.crt` — корневой сертификат для SSL.
+
+Пример пода с psql находится в папке `yc-sirius\edu-pavel-chepik`
+
+Примени манифест:
+
+```bash
+kubectl apply -f psql-test.yaml
+```
+
+Подключись к поду и запусти psql (переменные окружения уже заданы):
+
+```bash
+kubectl exec -it psql-test -- sh
+# внутри контейнера:
+psql
+```
