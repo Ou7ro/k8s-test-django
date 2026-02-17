@@ -185,6 +185,8 @@ http://star-burger.test
 
 ## Как подготовить dev окружение в связке с Yandex Cloud
 
+Выделенные для меня ресурсы облачной инфраструктуры - https://sirius-env-registry.website.yandexcloud.net/edu-pavel-chepik.html
+
 ### Доступ к PostgreSQL
 
 Для подключения к управляемой БД используется секрет `postgres`, содержащий параметры подключения и SSL-сертификат.
